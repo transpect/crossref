@@ -25,7 +25,7 @@
     attribute-name="select">
     <p:with-option name="attribute-value" select="$xpath"/>
     <p:input port="source">
-      <p:document href="../xsl/query-body.xsl"/>
+      <p:document href="../xsl/jats2query-body.xsl"/>
     </p:input>
   </p:add-attribute>
   
