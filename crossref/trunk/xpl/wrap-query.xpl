@@ -27,10 +27,6 @@
   
   <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl" />
   
-  <!--<cx:message>
-    <p:with-option name="message" select="$email"/>
-  </cx:message>-->
-  
   <p:xslt name="wrap">
     <p:input port="parameters"><p:empty/></p:input>
     <p:with-param name="email" select="$email"/>
@@ -93,7 +89,5 @@
   </p:template>
   
   <p:http-request omit-xml-declaration="false" encoding="US-ASCII"/>
-    
-  
-  
+
 </p:declare-step>
