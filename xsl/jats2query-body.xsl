@@ -20,7 +20,7 @@
   <!-- Query all citations that have an ID and that do not already have a DOI.
        There should be some Schematron running beforehand so that citations 
        without ID will be reported. -->
-  <xsl:template match="ref[@id][not(pub-id[@pub-it-type eq 'doi'])]" mode="look-for-bib">
+  <xsl:template match="ref[@id][not(pub-id[@pub-id-type eq 'doi'])]" mode="look-for-bib">
     <query key="{@id}" enable-multiple-hits="true">
       <xsl:apply-templates mode="transform-bib"/>  
     </query>
