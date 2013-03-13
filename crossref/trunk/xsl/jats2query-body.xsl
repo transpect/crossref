@@ -32,13 +32,15 @@
     </unstructured_citation>
   </xsl:template>
   
-  <xsl:template match="italic" mode="transform-bib">
+  <!-- Apparently i and b will be discarded during resolution. So we’ll just
+    dissolve them. -->
+  <xsl:template match="italic" mode="transform-bib_DISABLED">
     <i>
       <xsl:apply-templates mode="#current"/>
     </i>
   </xsl:template>
   
-  <xsl:template match="bold" mode="transform-bib">
+  <xsl:template match="bold" mode="transform-bib_DISABLED">
     <b>
       <xsl:apply-templates mode="#current"/>
     </b>
