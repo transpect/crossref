@@ -32,6 +32,10 @@
     </unstructured_citation>
   </xsl:template>
   
+  <xsl:template match="text()" mode="transform-bib">
+    <xsl:value-of select="replace(., '&#xad;', '')"/>
+  </xsl:template>
+  
   <!-- Apparently i and b will be discarded during resolution. So we’ll just
     dissolve them. -->
   <xsl:template match="italic" mode="transform-bib_DISABLED">

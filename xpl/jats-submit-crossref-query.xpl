@@ -25,7 +25,8 @@
   <p:option name="email" required="true"/>
   <p:option name="user" required="true"/>
   <p:option name="pass" required="true"/>
-    
+  <p:option name="fire" required="false" select="'true'"/>
+  
   <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl" />
   <p:import href="jats2crossref-query-body.xpl"/>
   <p:import href="wrap-query.xpl"/>
@@ -38,6 +39,7 @@
     <p:with-option name="email" select="$email"/>
     <p:with-option name="user" select="$user"/>
     <p:with-option name="pass" select="$pass"/>
+    <p:with-option name="fire" select="$fire"/>
     <p:with-option name="batch-id" select="concat(replace(base-uri(), '^.+/', ''), '?timestamp=', current-dateTime())"/>
   </crq:wrap-query>
   
