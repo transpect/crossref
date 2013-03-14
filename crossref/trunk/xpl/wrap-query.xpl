@@ -24,6 +24,7 @@
   <p:option name="batch-id" required="true"/>
   <p:option name="user" required="true"/>
   <p:option name="pass" required="true"/>
+  <p:option name="fire" required="false" select="'true'"/>
   
   <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl" />
   
@@ -66,7 +67,7 @@
   
   <p:in-scope-names name="vars"/>
   
-  <p:template>
+  <p:template name="http-request">
     <p:input port="template">
       <p:inline>
         <c:request 
@@ -88,6 +89,18 @@
     </p:input>
   </p:template>
   
-  <p:http-request omit-xml-declaration="false" encoding="US-ASCII"/>
+  <p:choose>
+    <p:when test="$fire = 'true'">
+      <p:http-request omit-xml-declaration="false" encoding="US-ASCII"/>    
+    </p:when>
+    <p:otherwise>
+      <p:identity>
+        <p:input port="source">
+          <p:pipe port="result" step="http-request"/>  
+        </p:input>
+      </p:identity>
+    </p:otherwise>
+  </p:choose>
+  
 
 </p:declare-step>
