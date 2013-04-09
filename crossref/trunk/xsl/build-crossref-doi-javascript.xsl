@@ -77,14 +77,14 @@
   <xsl:template name="javascript-begin">
     <xsl:text>#target indesign
 app.scriptPreferences.userInteractionLevel = UserInteractionLevels.interactWithAll;
-    </xsl:text>
+</xsl:text>
   </xsl:template>
 
   <xsl:template name="javascript-end">
-    <xsl:text>
-var myDoc = app.activeDocument,
+    <xsl:text>var myDoc = app.activeDocument,
     intHypIDlength = arrHyperlinkIDs.length,
-    intNotFound = 0;
+    intNotFound = 0,
+    arrNotFound = [];
 if(app.documents.length != 0) {
 	while( intHypIDlength-- ) {
 			try{
@@ -92,13 +92,23 @@ if(app.documents.length != 0) {
 				myPara = myHyperlink.destinationText.paragraphs[0].select(),
 				intParaCharLength = myDoc.selection[0].contents.length;
 				myDoc.selection[0].paragraphs[0].insertionPoints[intParaCharLength - 1].select();
-				myDoc.selection[0].contents = " DOI: " + arrDOIs[intHypIDlength];
+				myDoc.selection[0].contents = " " + arrDOIs[intHypIDlength];
+				myHyperlinkURL = myDoc.hyperlinkURLDestinations.add("http://dx.doi.org/" +  arrDOIs[intHypIDlength]);
+				myHyperlinkSource = myDoc.hyperlinkTextSources.add(
+					myDoc.selection[0].paragraphs[0].characters.itemByRange(
+						intParaCharLength - 1, 
+						intParaCharLength + arrDOIs[intHypIDlength].length
+					)
+				);
+				myHyperlink = myDoc.hyperlinks.add(myHyperlinkSource, myHyperlinkURL).name = arrDOIs[intHypIDlength];
+				myHyperlink.visible=true;
 			} catch(e) {
 				intNotFound++;
+				arrNotFound.push( arrDOIs[intHypIDlength] );
 			}
 		}
 	if(intNotFound != 0) {
-		alert("Fertig!\rEs wurden von " + arrHyperlinkIDs.length + " DOIs insgesamt " + intNotFound + " NICHT hinzugefügt.\r ", "DOI hinzufügen");
+		alert("Fertig!\rEs wurden von " + arrHyperlinkIDs.length + " DOIs folgende " + intNotFound + " nicht hinzugefügt:\r\r" + arrNotFound.join("\r"), "DOI hinzufügen");
 	} else {
 		alert("Fertig!\rEs wurden " + arrHyperlinkIDs.length + " DOIs hinzugefügt.", "DOI hinzufügen");
 	}
