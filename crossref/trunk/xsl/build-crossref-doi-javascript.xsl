@@ -27,40 +27,15 @@
       select="//crr:query[@status eq 'resolved'][crr:doi]/crr:doi"/>
     <xsl:value-of select="'var arrHyperlinkIDs = ['"/>
 
-    <xsl:for-each select="$key_ids">
-<!-- input example: 
-     id_HyperlinkTextDestination_zzlit_Geibel-Jakobs_Olbrich_1998
-
-     examples of hyperlink text destination id in indesign:
-     zzlit_Häfner_2005
-     zzlit_Greif#Kurtz_1996
-     zzlit_Green#Kern#Braff#Mintz_2000
-     zzlit_Gouzoulis-Mayfrank_2003
-     zzlit_Geibel-Jakobs#Olbrich_1998
-     zzlit_Gauggel_2006
--->
-      <xsl:variable name="indesign-id" as="xs:string"
-        select="concat(
-                  'zzlit_', 
-                  replace(
-                    replace(
-                      replace(
-                        replace(
-                          current(),
-                          'id_HyperlinkTextDestination_(zzlit_)?',
-                          ''),
-                        '(_$|[A-Z][.]_)',
-                        ''),
-                      '__+', 
-                      '_'),
-                    '([A-z])_([A-z])',
-                    '$1#$2')
-                  )"/>
-      <xsl:value-of select="concat('&quot;', $indesign-id, '&quot;')"/>
-      <xsl:if test="position() != last()">
-        <xsl:value-of select="','"/>
-      </xsl:if>
-    </xsl:for-each>
+    <!-- The key_ids must correspond to IDML’s HyperlinkTextDestination/@Name attributes -->
+    <xsl:sequence select="string-join(
+                            for $id in $key_ids return
+                              concat(
+                                '&quot;', $id,
+                                '&quot;'
+                              ),
+                            ','
+                          )"/>
 
     <xsl:value-of select="'];&#xd;'"/>
     <xsl:value-of select="'var arrDOIs = ['"/>
@@ -85,28 +60,36 @@ app.scriptPreferences.userInteractionLevel = UserInteractionLevels.interactWithA
     intHypIDlength = arrHyperlinkIDs.length,
     intNotFound = 0,
     arrNotFound = [];
+    alert(myDoc.hyperlinks[520].name);
+    alert(myDoc.hyperlinkTextDestinations.itemByName("zzlit_Geschwind#Fusillo_1966").destinationText.paragraphs[0].contents);
 if(app.documents.length != 0) {
-	while( intHypIDlength-- ) {
-			try{
-				var myHyperlink = myDoc.hyperlinkTextDestinations.itemByName(arrHyperlinkIDs[intHypIDlength])
-				myPara = myHyperlink.destinationText.paragraphs[0].select(),
-				intParaCharLength = myDoc.selection[0].contents.length;
+  while( intHypIDlength-- ) {
+    try{
+      var myHyperlink = myDoc.hyperlinkTextDestinations.itemByName(arrHyperlinkIDs[intHypIDlength]),
+        myPara = myHyperlink.destinationText.paragraphs[0].select(),
+        intParaCharLength = myDoc.selection[0].contents.length;
+			if (! myDoc.selection[0].contents.match(RegExp("DOI:"))) {
 				myDoc.selection[0].paragraphs[0].insertionPoints[intParaCharLength - 1].select();
-				myDoc.selection[0].contents = " " + arrDOIs[intHypIDlength];
+				myDoc.selection[0].contents = " DOI: " + arrDOIs[intHypIDlength]
 				myHyperlinkURL = myDoc.hyperlinkURLDestinations.add("http://dx.doi.org/" +  arrDOIs[intHypIDlength]);
 				myHyperlinkSource = myDoc.hyperlinkTextSources.add(
 					myDoc.selection[0].paragraphs[0].characters.itemByRange(
-						intParaCharLength - 1, 
-						intParaCharLength + arrDOIs[intHypIDlength].length
+						intParaCharLength + 5, 
+						intParaCharLength + 4 + arrDOIs[intHypIDlength].length
 					)
 				);
-				myHyperlink = myDoc.hyperlinks.add(myHyperlinkSource, myHyperlinkURL).name = arrDOIs[intHypIDlength];
-				myHyperlink.visible=true;
-			} catch(e) {
-				intNotFound++;
-				arrNotFound.push( arrDOIs[intHypIDlength] );
+				myHyperlink = myDoc.hyperlinks.add(myHyperlinkSource, myHyperlinkURL);
+				myHyperlink.name = arrDOIs[intHypIDlength] + "_" + Math.random();
+				myHyperlink.visible = true;
+				myHyperlink.borderColor = UIColors.BLUE;
+				myHyperlink.borderStyle = HyperlinkAppearanceStyle.SOLID;
+				myHyperlink.highlight = HyperlinkAppearanceHighlight.OUTLINE;
 			}
-		}
+		} catch(e) {
+		  intNotFound++;
+		  arrNotFound.push( arrDOIs[intHypIDlength] + " " + arrHyperlinkIDs[intHypIDlength] );
+	  }
+  }
 	if(intNotFound != 0) {
 		alert("Fertig!\rEs wurden von " + arrHyperlinkIDs.length + " DOIs folgende " + intNotFound + " nicht hinzugefügt:\r\r" + arrNotFound.join("\r"), "DOI hinzufügen");
 	} else {

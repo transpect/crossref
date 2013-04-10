@@ -21,7 +21,9 @@
        There should be some Schematron running beforehand so that citations 
        without ID will be reported. -->
   <xsl:template match="ref[@id][not(pub-id[@pub-id-type eq 'doi'])]" mode="look-for-bib">
-    <query key="{@id}" enable-multiple-hits="true">
+    <!-- specific-use carries the name of InDesign’s HypertextDestination. We need this (if available) for the 
+      generated .jsx -->
+    <query key="{(@specific-use, @id)[1]}" enable-multiple-hits="true">
       <xsl:apply-templates mode="transform-bib"/>  
     </query>
   </xsl:template>
