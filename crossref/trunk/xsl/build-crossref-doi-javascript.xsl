@@ -27,7 +27,8 @@
       select="//crr:query[@status eq 'resolved'][crr:doi]/crr:doi"/>
     <xsl:value-of select="'var arrHyperlinkIDs = ['"/>
 
-    <!-- The key_ids must correspond to IDML’s HyperlinkTextDestination/@Name attributes -->
+    <!-- The key_ids must correspond to IDML’s HyperlinkTextDestination/@Name attributes 
+    (without the leading 'HyperlinkTextDestination/') -->
     <xsl:sequence select="string-join(
                             for $id in $key_ids return
                               concat(
@@ -60,8 +61,6 @@ app.scriptPreferences.userInteractionLevel = UserInteractionLevels.interactWithA
     intHypIDlength = arrHyperlinkIDs.length,
     intNotFound = 0,
     arrNotFound = [];
-    alert(myDoc.hyperlinks[520].name);
-    alert(myDoc.hyperlinkTextDestinations.itemByName("zzlit_Geschwind#Fusillo_1966").destinationText.paragraphs[0].contents);
 if(app.documents.length != 0) {
   while( intHypIDlength-- ) {
     try{
