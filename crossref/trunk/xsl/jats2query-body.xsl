@@ -23,7 +23,7 @@
   <xsl:template match="ref[@id][not(pub-id[@pub-id-type eq 'doi'])]" mode="look-for-bib">
     <!-- specific-use carries the name of InDesign’s HypertextDestination. We need this (if available) for the 
       generated .jsx -->
-    <query key="{(@specific-use, @id)[1]}" enable-multiple-hits="true">
+    <query key="{substring((@specific-use, @id)[1], 1, 128)}" enable-multiple-hits="true">
       <xsl:apply-templates mode="transform-bib"/>  
     </query>
   </xsl:template>
