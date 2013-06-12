@@ -33,7 +33,13 @@
       <xsl:apply-templates mode="#current"/>
     </unstructured_citation>
   </xsl:template>
+
+  <!-- mixed citations that start with, e.g., 'DIN:' cause all queries in a batch to fail ("unable to parse query") -->
+  <xsl:template match="text()[. is (ancestor::mixed-citation//text())[1]][matches(., '^[\w\p{Pd}]+\.')]" mode="transform-bib">
+    <xsl:value-of select="replace(., '^([\w\p{Pd}]+)\.', '$1, Jj')"/>
+  </xsl:template>
   
+
   <xsl:template match="text()" mode="transform-bib">
     <xsl:value-of select="replace(., '&#xad;', '')"/>
   </xsl:template>
