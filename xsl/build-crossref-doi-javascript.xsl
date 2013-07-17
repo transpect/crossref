@@ -19,6 +19,12 @@
     encoding="utf-8"
     />
 
+  <xsl:template match="/" mode="foo">
+    <foo>
+      <xsl:apply-templates select="." mode="#default"/>
+    </foo>
+  </xsl:template>
+
   <xsl:template match="/">
     <xsl:call-template name="javascript-begin"/>
     <xsl:variable name="key_ids" as="xs:string*"

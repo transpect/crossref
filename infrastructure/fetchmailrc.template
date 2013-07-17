@@ -1,0 +1,4 @@
+set postmaster POSTMASTER_MAIL
+set logfile FETCHMAIL_LOG
+
+poll IMAPHOST protocol imap username USER password PASS mda "/usr/bin/procmail -m ./procmailrc"
