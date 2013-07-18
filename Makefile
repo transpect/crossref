@@ -33,7 +33,8 @@ export
 
 # This target will issue a crossref request
 %.qb.xml: $$(subst crossref,hobots,$$(subst .qb,,$$@))
-	-mkdir $(dir $@)
+	-svn mkdir $(abspath $(addsuffix ..,$(dir $@)))
+	-svn mkdir $(dir $@)
 	$(CODE)/calabash/calabash.sh \
 		-i source=$(call uri,$<) \
 		-o qb=$(call win_path,$@) \
