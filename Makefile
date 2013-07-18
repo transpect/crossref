@@ -9,7 +9,7 @@ unix_paths = $(shell cygpath -u -f $(1)"")
 else
 win_path = $(shell readlink -f $(1)"")
 uri = $(shell echo file:$(abspath $(1)) | perl -pe 's/ /%20/g')
-unix_paths = cat $(1)
+unix_paths = $(shell cat $(1))
 endif
 
 # The following variables should be set in local_defs.mk:
@@ -46,6 +46,7 @@ export
 # See README.txt for preparation instructions
 fetchmail:
 	fetchmail -f $(CODE)/crossref/infrastructure/fetchmailrc
+	-svn lock $(call unix_paths,$(CROSSREFTMP)/files.txt)
 	$(CODE)/calabash/calabash.sh \
 		-i merging-stylesheet=$(call uri,$(MAKEFILEDIR)/xsl/merge-results-with-query.xsl) \
 		-i conf=$(call uri,$(CODE)/conf/hogrefe_conf.xml) \
