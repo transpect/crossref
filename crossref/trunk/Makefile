@@ -9,7 +9,7 @@ unix_paths = $(shell cygpath -u -f $(1)"")
 else
 win_path = $(shell readlink -f $(1)"")
 uri = $(shell echo file:$(abspath $(1)) | perl -pe 's/ /%20/g')
-unix_paths = $(1)
+unix_paths = cat $(1)
 endif
 
 # The following variables should be set in local_defs.mk:
