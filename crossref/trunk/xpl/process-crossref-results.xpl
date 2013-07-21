@@ -16,6 +16,7 @@
     <p:documentation>Directory with crossref query result files (crossref_result
       xmlns="http://www.crossref.org/qrschema/2.0") </p:documentation>
   </p:option>
+  <p:option name="tmp-suffix" required="false" select="''"/>
   
   <p:input port="conf">
     <p:documentation>A transpect configuration file.</p:documentation>
@@ -66,6 +67,7 @@
       <p:input port="params">
         <p:pipe port="result" step="paths"/>
       </p:input>
+      <p:with-option name="tmp-suffix" select="$tmp-suffix"/>
     </crq:merge-results-with-query>
     <p:sink/>
   </p:for-each>

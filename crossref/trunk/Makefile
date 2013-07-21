@@ -3,14 +3,16 @@ MAKEFILEDIR = $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 CODE = $(abspath $(MAKEFILEDIR)/..)
 
 ifeq ($(shell uname -o),Cygwin)
-win_path = $(shell cygpath -ma $(1)"")
+win_path = $(shell cygpath -ma $(1))
 uri = $(shell echo file:///$(call win_path,$(1))  | perl -pe 's/ /%20/g')
-unix_paths = $(shell cygpath -u -f $(1)"")
+unix_paths = $(shell cygpath -u -f $(1))
 else
-win_path = $(shell readlink -f $(1)"")
+win_path = $(abspath $(1))
 uri = $(shell echo file:$(abspath $(1)) | perl -pe 's/ /%20/g')
-unix_paths = $(shell cat $(1))
+unix_paths = $(shell cat $(abspath $(1)))
 endif
+
+ACTIONLOG = /dev/null
 
 # The following variables should be set in local_defs.mk:
 
@@ -22,17 +24,73 @@ CROSSREFTMP=~/crossref
 -include $(MAKEFILEDIR)/local_defs.mk
 
 export
+unexport win_path uri unix_paths
 
-# Unfortunately, there will be some warnings because secondary
-# expansion will treat the function definitions as plain variables.
-# You can ignore warnings like the following:
-# cygpath: No such file or directory
-# cygpath: can't convert empty path
+
+testi:
+#	fetchmail -f $(CODE)/crossref/infrastructure/fetchmailrc
+	$(CODE)/calabash/calabash.sh \
+		-i merging-stylesheet=$(call uri,$(MAKEFILEDIR)/xsl/merge-results-with-query.xsl) \
+		-i conf=$(call uri,$(CODE)/conf/hogrefe_conf.xml) \
+		-o result=$(call win_path,$(CROSSREFTMP))/files.txt \
+		$(call uri,$(MAKEFILEDIR)/xpl/process-crossref-results.xpl) \
+		input-dir-uri=$(call uri,$(CROSSREFTMP)) \
+		tmp-suffix=".tmp"
+	ls -l $(CROSSREFTMP)
+	cat $(CROSSREFTMP)/files.txt
+	echo
+	echo $(call unix_paths,$(CROSSREFTMP)/files.txt)
+
+
+# This target should be invoked periodically.
+# See README.txt for preparation instructions
+%/files.txt:
+	fetchmail -f $(CODE)/crossref/infrastructure/fetchmailrc
+	$(CODE)/calabash/calabash.sh \
+		-i merging-stylesheet=$(call uri,$(MAKEFILEDIR)/xsl/merge-results-with-query.xsl) \
+		-i conf=$(call uri,$(CODE)/conf/hogrefe_conf.xml) \
+		-o result=$(call win_path,$@) \
+		$(call uri,$(MAKEFILEDIR)/xpl/process-crossref-results.xpl) \
+		input-dir-uri=$(call uri,$(CROSSREFTMP)) \
+		tmp-suffix=".tmp" \
+		2> $(CROSSREFTMP)/process-crossref-results.txt
+	ls -l $(CROSSREFTMP)
+	cat $(CROSSREFTMP)/files.txt
+	@echo
+
+fetchmail: $(abspath $(CROSSREFTMP))/files.txt
+	echo shell $(shell cat $(abspath $<))
+	echo unix $(call unix_paths,$<)
+	-svn up $(call unix_paths,$<)
+	-svn lock $(call unix_paths,$<)
+	$(foreach file,$(call unix_paths,$<),mv $(file).tmp $(file); )
+	-svn add --depth empty $(abspath $(addsuffix ..,$(dir $(call unix_paths,$<))))
+	-svn add --depth empty $(dir $(call unix_paths,$<))
+	-svn add $(call unix_paths,$<)
+	-svn add $(addsuffix .jsx,$(basename $(call unix_paths,$<)))
+	-svn ci --depth empty $(abspath $(addsuffix ..,$(dir $(call unix_paths,$<)))) -m automatic
+	-svn ci --depth empty $(dir $(call unix_paths,$<)) -m automatic
+	svn ci $(call unix_paths,$<) -m automatic
+	svn ci $(addsuffix .jsx,$(basename $(call unix_paths,$<))) -m automatic
+# Because of the needs-lock property set by hook: 
+	svn up $(call unix_paths,$<)
+	svn up $(addsuffix .jsx,$(basename $(call unix_paths,$<)))
+	-rm $(CROSSREFTMP)/*
+
+remove_old_crossrefs:
+	-svn up $(call unix_paths,$(abspath $(CROSSREFTMP))/files.txt)
+	-svn rm $(call unix_paths,$(abspath $(CROSSREFTMP))/files.txt)
+	-svn rm $(addsuffix .jsx,$(basename $(call unix_paths,$(abspath $(CROSSREFTMP))/files.txt)))
+	-svn ci $(call unix_paths,$(abspath $(CROSSREFTMP))/files.txt) -m automatic
+	-svn ci $(addsuffix .jsx,$(basename $(call unix_paths,$(abspath $(CROSSREFTMP))/files.txt))) -m automatic
+
 
 .SECONDEXPANSION:
 
 # This target will issue a crossref request
 %.qb.xml: $$(subst crossref,hobots,$$(subst .qb,,$$@))
+	echo "nun $@ erzeugen" >> $(ACTIONLOG)
+	echo "ggf. Werkverzeichnis $(abspath $(addsuffix ..,$(dir $@))) erstellen" >> $(ACTIONLOG)
 	-svn mkdir $(abspath $(addsuffix ..,$(dir $@)))
 	-svn mkdir $(dir $@)
 	$(CODE)/calabash/calabash.sh \
@@ -41,24 +99,5 @@ export
 		$(call uri,$(MAKEFILEDIR)/xpl/jats-submit-crossref-query.xpl) \
 		user=$(CROSSREFUSER) pass=$(CROSSREFPASS) \
 		email=$(EMAIL)
-
-# This target should be invoked periodically.
-# See README.txt for preparation instructions
-fetchmail:
-	fetchmail -f $(CODE)/crossref/infrastructure/fetchmailrc
-	-svn lock $(call unix_paths,$(CROSSREFTMP)/files.txt)
-	$(CODE)/calabash/calabash.sh \
-		-i merging-stylesheet=$(call uri,$(MAKEFILEDIR)/xsl/merge-results-with-query.xsl) \
-		-i conf=$(call uri,$(CODE)/conf/hogrefe_conf.xml) \
-		-o result=$(call win_path,$(CROSSREFTMP))/files.txt \
-		$(call uri,$(MAKEFILEDIR)/xpl/process-crossref-results.xpl) \
-		input-dir-uri=$(call uri,$(CROSSREFTMP))
-	-svn add --depth empty $(abspath $(addsuffix ..,$(dir $(call unix_paths,$(CROSSREFTMP)/files.txt))))
-	-svn add --depth empty $(dir $(call unix_paths,$(CROSSREFTMP)/files.txt))
-	-svn add $(call unix_paths,$(CROSSREFTMP)/files.txt)
-	-svn add $(addsuffix .jsx,$(basename $(call unix_paths,$(CROSSREFTMP)/files.txt)))
-	-svn ci --depth empty $(abspath $(addsuffix ..,$(dir $(call unix_paths,$(CROSSREFTMP)/files.txt)))) -m automatic
-	-svn ci --depth empty $(dir $(call unix_paths,$(CROSSREFTMP)/files.txt)) -m automatic
-	svn ci $(call unix_paths,$(CROSSREFTMP)/files.txt) -m automatic
-	svn ci $(addsuffix .jsx,$(basename $(call unix_paths,$(CROSSREFTMP)/files.txt))) -m automatic
-	-rm $(CROSSREFTMP)/*
+	-svn ci --depth empty $(abspath $(addsuffix ..,$(dir $@))) -m automatic
+	-svn ci $(dir $@) -m automatic

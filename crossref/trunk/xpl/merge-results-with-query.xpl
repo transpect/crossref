@@ -11,6 +11,8 @@
   name="merge-results-with-query"
   type="crq:merge-results-with-query">
   
+  <p:option name="tmp-suffix" required="false" select="''"/>
+
   <p:input port="source" primary="true">
     <p:documentation>CrossRef query results</p:documentation>
   </p:input>
@@ -52,7 +54,7 @@
       <p:pipe step="merge" port="secondary"/> 
     </p:iteration-source>
     <p:store>
-      <p:with-option name="href" select="base-uri()"/>
+      <p:with-option name="href" select="concat(base-uri(), $tmp-suffix)"/>
     </p:store>
     <p:xslt name="jsx" initial-mode="foo">
       <p:input port="parameters"><p:empty/></p:input>
@@ -63,6 +65,11 @@
         <p:pipe port="current" step="store"/>  
       </p:input>
     </p:xslt>
+    <cx:message>
+      <p:with-option name="message" select="replace(base-uri(), 'xml$', 'jsx')">
+        <p:pipe port="current" step="store"/>
+      </p:with-option>
+    </cx:message>
     <p:store method="text" name="store-jsx">
       <p:with-option name="href" select="replace(base-uri(), 'xml$', 'jsx')">
         <p:pipe port="current" step="store"/>
