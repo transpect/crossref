@@ -1,6 +1,7 @@
 :0fb:
 *
-| qprint -d 
+| /usr/bin/base64 -d \
+| /usr/local/bin/qprint -d 
 
 :0b:
 *
