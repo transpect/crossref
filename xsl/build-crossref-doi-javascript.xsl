@@ -73,9 +73,9 @@ if(app.documents.length != 0) {
       var myHyperlink = myDoc.hyperlinkTextDestinations.itemByName(arrHyperlinkIDs[intHypIDlength]),
         myPara = myHyperlink.destinationText.paragraphs[0].select(),
         intParaCharLength = myDoc.selection[0].contents.length;
-			if (! myDoc.selection[0].contents.match(RegExp("DOI:"))) {
+			if (! myDoc.selection[0].contents.match(RegExp("doi:"))) {
 				myDoc.selection[0].paragraphs[0].insertionPoints[intParaCharLength - 1].select();
-				myDoc.selection[0].contents = " DOI: " + arrDOIs[intHypIDlength]
+				myDoc.selection[0].contents = " doi: " + arrDOIs[intHypIDlength]
 				myHyperlinkURL = myDoc.hyperlinkURLDestinations.add("http://dx.doi.org/" +  arrDOIs[intHypIDlength]);
 				myHyperlinkSource = myDoc.hyperlinkTextSources.add(
 					myDoc.selection[0].paragraphs[0].characters.itemByRange(
