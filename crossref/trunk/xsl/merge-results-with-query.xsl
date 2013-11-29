@@ -62,6 +62,7 @@
       <xsl:comment>
 Stats:
                   total: <xsl:value-of select="count(crqr:query_result/crqr:body/crqr:query)"/>
+   without ID in source: <xsl:value-of select="count(crqr:query_result/crqr:body/crqr:query[starts-with(@key, 'generated_no-id_')]/@status[. eq 'unresolved'])"/>
                resolved: <xsl:value-of select="count(crqr:query_result/crqr:body/crqr:query/@status[. eq 'resolved'])"/>
   completely unresolved: <xsl:value-of select="count(crqr:query_result/crqr:body/crqr:query/@status[. eq 'unresolved'][../crqr:msg])"/>
    unresolved with tags: <xsl:value-of select="count(crqr:query_result/crqr:body/crqr:query/@status[. eq 'unresolved'][not(../crqr:msg)])"/>

@@ -23,9 +23,19 @@
   <xsl:template match="ref[@id | mixed-citation/@id][not(pub-id[@pub-id-type eq 'doi'])]" mode="look-for-bib">
     <!-- specific-use carries the name of InDesign’s HypertextDestination. We need this (if available) for the 
       generated .jsx -->
-    <query key="{substring((@specific-use, @id, mixed-citation/@id)[1], 1, 128)}" enable-multiple-hits="true">
-      <xsl:apply-templates mode="transform-bib"/>  
-    </query>
+    <xsl:variable name="key" as="xs:string?" select="(@specific-use, @id, mixed-citation/@id)[1]"/>
+    <xsl:choose>
+      <xsl:when test="not($key) or ($key = '')">
+        <query key="generated_no-id_{generate-id()}" enable-multiple-hits="true">
+          <xsl:apply-templates mode="transform-bib"/>  
+        </query>
+      </xsl:when>
+      <xsl:otherwise>
+        <query key="{substring($key, 1, 128)}" enable-multiple-hits="true">
+          <xsl:apply-templates mode="transform-bib"/>  
+        </query>    
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
   
   <xsl:template match="mixed-citation" mode="transform-bib">
