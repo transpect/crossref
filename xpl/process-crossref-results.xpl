@@ -72,12 +72,12 @@
     <p:sink/>
   </p:for-each>
   
-  <p:xslt name="files">
+  <p:xslt name="files" template-name="main">
     <p:input port="parameters"><p:empty/></p:input>
     <p:input port="stylesheet">
       <p:inline>
         <xsl:stylesheet version="2.0">
-          <xsl:template match="/">
+          <xsl:template name="main">
             
             <foo>
               <xsl:sequence select="string-join(
