@@ -20,6 +20,7 @@ EMAIL=crossref@acme.com
 USER=user
 PASS=pass
 CROSSREFTMP=~/crossref
+FETCHMAIL=fetchmail
 
 -include $(MAKEFILEDIR)/local_defs.mk
 
@@ -28,7 +29,7 @@ unexport win_path uri unix_paths
 
 
 testi:
-#	fetchmail -f $(CODE)/crossref/infrastructure/fetchmailrc
+#	$(FETCHMAIL) -f $(CODE)/crossref/infrastructure/fetchmailrc
 	$(CODE)/calabash/calabash.sh \
 		-i merging-stylesheet=$(call uri,$(MAKEFILEDIR)/xsl/merge-results-with-query.xsl) \
 		-i conf=$(call uri,$(CODE)/conf/hogrefe_conf.xml) \
@@ -45,7 +46,7 @@ testi:
 # This target should be invoked periodically.
 # See README.txt for preparation instructions
 %/files.txt:
-	fetchmail -f $(CODE)/crossref/infrastructure/fetchmailrc
+	$(FETCHMAIL) -f $(CODE)/crossref/infrastructure/fetchmailrc || [ $$? -eq 1 ]
 	$(CODE)/calabash/calabash.sh \
 		-i merging-stylesheet=$(call uri,$(MAKEFILEDIR)/xsl/merge-results-with-query.xsl) \
 		-i conf=$(call uri,$(CODE)/conf/hogrefe_conf.xml) \
@@ -59,6 +60,7 @@ testi:
 	@echo
 
 fetchmail: $(abspath $(CROSSREFTMP))/files.txt
+ifneq (,$(shell cat $<))
 	echo shell $(shell cat $(abspath $<))
 	echo unix $(call unix_paths,$<)
 	-svn up $(call unix_paths,$<)
@@ -76,6 +78,7 @@ fetchmail: $(abspath $(CROSSREFTMP))/files.txt
 	svn up $(call unix_paths,$<)
 	svn up $(addsuffix .jsx,$(basename $(call unix_paths,$<)))
 	-rm $(CROSSREFTMP)/*
+endif
 
 remove_old_crossrefs:
 	-svn up $(call unix_paths,$(abspath $(CROSSREFTMP))/files.txt)
