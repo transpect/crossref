@@ -9,7 +9,7 @@ unix_paths = $(shell cygpath -u -f $(1))
 else
 win_path = $(abspath $(1))
 uri = $(shell echo file:$(abspath $(1)) | perl -pe 's/ /%20/g')
-unix_paths = $(shell cat $(abspath $(1)))
+unix_paths = $(shell cat $(abspath $(1)) /dev/null)
 endif
 
 ACTIONLOG = /dev/null
@@ -55,30 +55,27 @@ testi:
 		input-dir-uri=$(call uri,$(CROSSREFTMP)) \
 		tmp-suffix=".tmp" \
 		2> $(CROSSREFTMP)/process-crossref-results.txt
-	ls -l $(CROSSREFTMP)
-	cat $(CROSSREFTMP)/files.txt
-	@echo
 
 fetchmail: $(abspath $(CROSSREFTMP))/files.txt
-ifneq (,$(shell cat $<))
-	echo shell $(shell cat $(abspath $<))
-	echo unix $(call unix_paths,$<)
-	-svn up $(call unix_paths,$<)
-	-svn lock $(call unix_paths,$<)
-	$(foreach file,$(call unix_paths,$<),mv $(file).tmp $(file); )
-	-svn add --depth empty $(abspath $(addsuffix ..,$(dir $(call unix_paths,$<))))
-	-svn add --depth empty $(dir $(call unix_paths,$<))
-	-svn add $(call unix_paths,$<)
-	-svn add $(addsuffix .jsx,$(basename $(call unix_paths,$<)))
-	-svn ci --depth empty $(abspath $(addsuffix ..,$(dir $(call unix_paths,$<)))) -m automatic
-	-svn ci --depth empty $(dir $(call unix_paths,$<)) -m automatic
-	svn ci $(call unix_paths,$<) -m automatic
-	svn ci $(addsuffix .jsx,$(basename $(call unix_paths,$<))) -m automatic
+	$(foreach file,$(call unix_paths,$<),$(MAKE) -C $(MAKEFILEDIR) process_fetched FILE=$(file); )
+
+process_fetched:
+	-svn up $(FILE)
+	-svn lock $(FILE)
+	mv $(FILE).tmp $(FILE)
+	-svn add --depth empty $(abspath $(addsuffix ..,$(dir $(FILE))))
+	-svn add --depth empty $(dir $(FILE))
+	-svn add $(FILE)
+	-svn add $(addsuffix .jsx,$(basename $(FILE)))
+	-svn ci --depth empty $(abspath $(addsuffix ..,$(dir $(FILE)))) -m automatic
+	-svn ci --depth empty $(dir $(FILE)) -m automatic
+	svn ci $(FILE) -m automatic
+	svn ci $(addsuffix .jsx,$(basename $(FILE))) -m automatic
 # Because of the needs-lock property set by hook: 
-	svn up $(call unix_paths,$<)
-	svn up $(addsuffix .jsx,$(basename $(call unix_paths,$<)))
+	svn up $(FILE)
+	svn up $(addsuffix .jsx,$(basename $(FILE)))
 	-rm $(CROSSREFTMP)/*
-endif
+
 
 remove_old_crossrefs:
 	-svn up $(call unix_paths,$(abspath $(CROSSREFTMP))/files.txt)
@@ -104,3 +101,4 @@ remove_old_crossrefs:
 		email=$(EMAIL)
 	-svn ci --depth empty $(abspath $(addsuffix ..,$(dir $@))) -m automatic
 	-svn ci $(dir $@) -m automatic
+
