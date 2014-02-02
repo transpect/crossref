@@ -43,6 +43,4 @@
     <p:with-option name="batch-id" select="concat(replace(base-uri(), '^.+/', ''), '?timestamp=', current-dateTime())"/>
   </crq:wrap-query>
   
-
-  
 </p:declare-step>

@@ -59,13 +59,20 @@
   <xsl:template match="/*" mode="merge">
     <xsl:copy copy-namespaces="no">
       <xsl:apply-templates select="@*" mode="#current"/>
+      <xsl:variable name="multi-groups" as="xs:integer"
+        select="count(distinct-values(crqr:query_result/crqr:body/crqr:query[@status eq 'multiresolved']/@key))"/>
+      <xsl:variable name="duplicates" as="xs:integer"
+        select="count(crqr:query_result/crqr:body/crqr:query[@status eq 'multiresolved']) - $multi-groups"/>
       <xsl:comment>
 Stats:
-                  total: <xsl:value-of select="count(crqr:query_result/crqr:body/crqr:query)"/>
+                  total: <xsl:value-of select="count(crqr:query_result/crqr:body/crqr:query) - $duplicates"/>
    without ID in source: <xsl:value-of select="count(crqr:query_result/crqr:body/crqr:query[starts-with(@key, 'generated_no-id_')]/@status[. eq 'unresolved'])"/>
-               resolved: <xsl:value-of select="count(crqr:query_result/crqr:body/crqr:query/@status[. eq 'resolved'])"/>
+      uniquely resolved: <xsl:value-of select="count(crqr:query_result/crqr:body/crqr:query/@status[. eq 'resolved'])"/>
+          multiresolved: <xsl:value-of select="$multi-groups"/> (<xsl:value-of select="$duplicates"/> DOIs will be ignored in favor of the first DOI that was returned for each key)
   completely unresolved: <xsl:value-of select="count(crqr:query_result/crqr:body/crqr:query/@status[. eq 'unresolved'][../crqr:msg])"/>
+              malformed: <xsl:value-of select="count(crqr:query_result/crqr:body/crqr:query/@status[. eq 'malformed'])"/> (usually theses or proceedings) 
    unresolved with tags: <xsl:value-of select="count(crqr:query_result/crqr:body/crqr:query/@status[. eq 'unresolved'][not(../crqr:msg)])"/>
+                   none: <xsl:value-of select="count(crqr:query_result/crqr:body/crqr:query/@status[. eq 'none'])"/>
   <xsl:text>&#xa;</xsl:text>
               </xsl:comment>
       <xsl:apply-templates select="node()" mode="#current"/>

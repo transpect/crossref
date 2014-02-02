@@ -27,16 +27,20 @@
 
   <xsl:template match="/">
     <xsl:call-template name="javascript-begin"/>
-    <xsl:variable name="key_ids" as="xs:string*"
-      select="//crr:query[@status eq 'resolved'][crr:doi]/@key"/>
-    <xsl:variable name="dois" as="xs:string*"
-      select="//crr:query[@status eq 'resolved'][crr:doi]/crr:doi"/>
+    
+    <xsl:variable name="resolved-queries" as="element(crr:query)*">
+      <xsl:for-each-group select="//crr:query[@status = ('multiresolved', 'resolved')][crr:doi]" group-by="@key">
+        <!-- first doi in group if multiresolved -->  
+        <xsl:sequence select="."/>
+      </xsl:for-each-group>  
+    </xsl:variable>
+    
     <xsl:value-of select="'var arrHyperlinkIDs = ['"/>
-
-    <!-- The key_ids must correspond to IDML’s HyperlinkTextDestination/@Name attributes 
+    
+    <!-- The keys must correspond to IDML’s HyperlinkTextDestination/@Name attributes 
     (without the leading 'HyperlinkTextDestination/') -->
     <xsl:sequence select="string-join(
-                            for $id in $key_ids return
+                            for $id in $resolved-queries/@key return
                               concat(
                                 '&quot;', $id,
                                 '&quot;'
@@ -46,8 +50,8 @@
 
     <xsl:value-of select="'];&#xd;'"/>
     <xsl:value-of select="'var arrDOIs = ['"/>
-    <xsl:for-each select="$dois">
-      <xsl:value-of select="concat('&quot;', current(), '&quot;')"/>
+    <xsl:for-each select="$resolved-queries/crr:doi">
+      <xsl:value-of select="concat('&quot;', ., '&quot;')"/>
       <xsl:if test="position() != last()">
         <xsl:value-of select="','"/>
       </xsl:if>
@@ -107,7 +111,7 @@ if(app.documents.length != 0) {
 
   <!-- catch all -->
 
-  <xsl:template match="node()|@*" mode="#all" priority="-1">
+  <xsl:template match="*|@*" mode="#all" priority="-1">
     <xsl:copy copy-namespaces="no">
       <xsl:apply-templates select="@*"     mode="#current"/>
       <xsl:apply-templates select="node()" mode="#current"/>
