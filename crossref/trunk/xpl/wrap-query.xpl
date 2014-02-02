@@ -96,7 +96,7 @@
     <p:otherwise>
       <p:identity>
         <p:input port="source">
-          <p:pipe port="result" step="http-request"/>  
+          <p:inline><c:ok/></p:inline>  
         </p:input>
       </p:identity>
     </p:otherwise>

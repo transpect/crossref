@@ -24,6 +24,7 @@
     </p:documentation>
   </p:input>
   <p:input port="merging-stylesheet">
+    <p:document href="../xsl/merge-results-with-query.xsl"/>
     <p:documentation>As a default, you may use ../xsl/merge-results-with-query.xsl
     Please note that it will rely on the transpect parameter work-path if no qb
     document is supplied.
@@ -37,6 +38,8 @@
     <p:documentation>The results, augmented with the initial unstructured_citations</p:documentation>
   </p:output>
   
+  <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl" />
+
   <p:xslt name="merge">
     <p:input port="stylesheet">
       <p:pipe port="merging-stylesheet" step="merge-results-with-query"/>
