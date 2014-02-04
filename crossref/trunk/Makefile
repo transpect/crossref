@@ -48,7 +48,7 @@ testi:
 # See README.txt for preparation instructions
 %/files.txt:
 	$(FETCHMAIL) -f $(CODE)/crossref/infrastructure/fetchmailrc || [ $$? -eq 1 ]
-	$(CODE)/calabash/calabash.sh \
+	$(CODE)/calabash/calabash.sh -D \
 		-i merging-stylesheet=$(call uri,$(MAKEFILEDIR)/xsl/merge-results-with-query.xsl) \
 		-i conf=$(call uri,$(CODE)/conf/hogrefe_conf.xml) \
 		-o result=$(call win_path,$@) \
@@ -99,7 +99,7 @@ remove_old_crossrefs:
 		-o qb=$(call win_path,$@) \
 		$(call uri,$(MAKEFILEDIR)/xpl/jats-submit-crossref-query.xpl) \
 		user=$(CROSSREFUSER) pass=$(CROSSREFPASS) \
-		email=$(EMAIL) fire=$(FIRE)
-	-svn ci --depth empty $(abspath $(addsuffix ..,$(dir $@))) -m automatic
-	-svn ci $(dir $@) -m automatic
+		email=$(EMAIL) fire=$(FIRE) 2>&1 >> $(ACTIONLOG)
+	-svn ci --depth empty $(abspath $(addsuffix ..,$(dir $@))) -m automatic 2>&1 >> $(ACTIONLOG)
+	-svn ci $(dir $@) -m automatic 2>&1 >> $(ACTIONLOG)
 

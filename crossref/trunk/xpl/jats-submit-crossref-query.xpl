@@ -34,6 +34,10 @@
   <jats:crossref-query-body name="body">
     <p:with-option name="xpath" select="$xpath"/>
   </jats:crossref-query-body>
+
+  <cx:message>
+    <p:with-option name="message" select="concat('Query count: ', count(//*:query))"/>
+  </cx:message>
   
   <crq:wrap-query name="wrap">
     <p:with-option name="email" select="$email"/>
