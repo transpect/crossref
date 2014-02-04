@@ -57,7 +57,8 @@
     </p:input>
   </p:xslt>  
   
-  <p:validate-with-xml-schema assert-valid="true">
+  <p:validate-with-xml-schema>
+    <p:with-option name="assert-valid" select="$fire"/>
     <p:input port="schema">
       <p:document href="../xsd/crossref_query_input2.0.xsd"/>
     </p:input>
