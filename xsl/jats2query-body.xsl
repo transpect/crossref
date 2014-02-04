@@ -73,7 +73,7 @@
 
   <xsl:template match="pub-id[@pub-id-type = 'doi'][string-length(.) lt 6]" 
     mode="transform-bib" priority="2">
-    <xsl:message>DOI too short in <xsl:sequence select=".."/></xsl:message>
+    <xsl:message>DOI '<xsl:value-of select="."/>' too short in <xsl:value-of select="ancestor::mixed-citation/(@specific-use, @id)[1]"/></xsl:message>
   </xsl:template>
   
 
