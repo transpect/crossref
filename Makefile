@@ -21,6 +21,7 @@ USER=user
 PASS=pass
 CROSSREFTMP=~/crossref
 FETCHMAIL=fetchmail
+FIRE=true
 
 -include $(MAKEFILEDIR)/local_defs.mk
 
@@ -98,7 +99,7 @@ remove_old_crossrefs:
 		-o qb=$(call win_path,$@) \
 		$(call uri,$(MAKEFILEDIR)/xpl/jats-submit-crossref-query.xpl) \
 		user=$(CROSSREFUSER) pass=$(CROSSREFPASS) \
-		email=$(EMAIL)
+		email=$(EMAIL) fire=$(FIRE)
 	-svn ci --depth empty $(abspath $(addsuffix ..,$(dir $@))) -m automatic
 	-svn ci $(dir $@) -m automatic
 
