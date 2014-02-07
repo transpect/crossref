@@ -128,21 +128,25 @@
   
   <xsl:function name="crq:normalize-space" as="xs:string">
     <xsl:param name="input" as="xs:string"/>
-    <xsl:sequence select="normalize-space(
-                            replace(
+    <xsl:sequence select="substring( 
+			    normalize-space(
                               replace(
                                 replace(
-                                  $input, (: eliminating space around the dash in page number ranges :)
-                                  '(\d+)[\s\p{Zs}]?(\p{Pd})[\s\p{Zs}]?(\d+)',
-                                  '$1$2$3'
-                                ),
-                                '(^[.,;]|[.,;]\s*$)',
-                                ''
-                              ), 
-                              '[\p{Zs}\s]+', 
-                              ' '
-                            )
-                          )"/>
+                                  replace(
+                                    $input, (: eliminating space around the dash in page number ranges :)
+                                    '(\d+)[\s\p{Zs}]?(\p{Pd})[\s\p{Zs}]?(\d+)',
+                                    '$1$2$3'
+                                  ),
+                                  '(^[.,;]|[.,;]\s*$)',
+                                  ''
+                                ), 
+                                '[\p{Zs}\s]+', 
+                                ' '
+                              )
+                            ),
+			    1,
+			    256
+			  )"/>
   </xsl:function>
   
 </xsl:stylesheet>
