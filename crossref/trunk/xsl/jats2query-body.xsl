@@ -49,7 +49,7 @@
   
   <xsl:template match="article-title | chapter-title | volume | year" mode="transform-bib">
     <xsl:element name="{replace(name(), '-', '_')}">
-      <xsl:value-of select="crq:normalize-space(.)"/>
+      <xsl:value-of select="replace(crq:normalize-space(.), '(^[.,;]|[.,;]\s*$)', '')"/>
     </xsl:element>
   </xsl:template>
 
@@ -97,7 +97,7 @@
     </xsl:variable>
     <xsl:if test="$name">
       <xsl:element name="{$name}">
-        <xsl:value-of select="crq:normalize-space(.)"/>
+        <xsl:value-of select="replace(crq:normalize-space(.), '(^[.,;]|[.,;]\s*$)', '')"/>
       </xsl:element>
     </xsl:if>
   </xsl:template>
@@ -131,15 +131,11 @@
     <xsl:sequence select="substring( 
 			    normalize-space(
                               replace(
-                                replace(
                                   replace(
                                     $input, (: eliminating space around the dash in page number ranges :)
                                     '(\d+)[\s\p{Zs}]?(\p{Pd})[\s\p{Zs}]?(\d+)',
                                     '$1$2$3'
                                   ),
-                                  '(^[.,;]|[.,;]\s*$)',
-                                  ''
-                                ), 
                                 '[\p{Zs}\s]+', 
                                 ' '
                               )
