@@ -63,49 +63,68 @@
   <xsl:template name="javascript-begin">
     <xsl:text>#target indesign
 app.scriptPreferences.userInteractionLevel = UserInteractionLevels.interactWithAll;
+var myLinkCharStyleName = "ch_xref_doi";
+var myDOIurl = "http://doi.org/";
 </xsl:text>
   </xsl:template>
 
   <xsl:template name="javascript-end">
-    <xsl:text>var myDoc = app.activeDocument,
+    <xsl:text>if(app.documents.length != 0) {
+	var myDoc = app.activeDocument,
     intHypIDlength = arrHyperlinkIDs.length,
     intNotFound = 0,
     arrNotFound = [];
-if(app.documents.length != 0) {
-  while( intHypIDlength-- ) {
-    try{
-      var myHyperlink = myDoc.hyperlinkTextDestinations.itemByName(arrHyperlinkIDs[intHypIDlength]),
-        myPara = myHyperlink.destinationText.paragraphs[0].select(),
-        intParaCharLength = myDoc.selection[0].contents.length;
-			if (! myDoc.selection[0].contents.match(RegExp("doi:"))) {
-				myDoc.selection[0].paragraphs[0].insertionPoints[intParaCharLength - 1].select();
-				myDoc.selection[0].contents = " doi: " + arrDOIs[intHypIDlength]
-				myHyperlinkURL = myDoc.hyperlinkURLDestinations.add("http://dx.doi.org/" +  arrDOIs[intHypIDlength]);
-				myHyperlinkSource = myDoc.hyperlinkTextSources.add(
-					myDoc.selection[0].paragraphs[0].characters.itemByRange(
-						intParaCharLength + 5, 
-						intParaCharLength + 4 + arrDOIs[intHypIDlength].length
-					)
-				);
-				myHyperlink = myDoc.hyperlinks.add(myHyperlinkSource, myHyperlinkURL);
-				myHyperlink.name = arrDOIs[intHypIDlength] + "_" + Math.random();
-				myHyperlink.visible = true;
-				myHyperlink.borderColor = UIColors.BLUE;
-				myHyperlink.borderStyle = HyperlinkAppearanceStyle.SOLID;
-				myHyperlink.highlight = HyperlinkAppearanceHighlight.OUTLINE;
+	var myLinkCharStyle = getCharacterStyle(myLinkCharStyleName, myDoc); // ==>
+	if(myLinkCharStyle) {
+		while( intHypIDlength-- ) {
+			try{
+				var myHyperlink = myDoc.hyperlinkTextDestinations.itemByName(arrHyperlinkIDs[intHypIDlength]),
+					myPara = myHyperlink.destinationText.paragraphs[0].select(),
+					intParaCharLength = myDoc.selection[0].contents.length;
+				if (! myDoc.selection[0].contents.match(RegExp(myDOIurl))) {
+					myDoc.selection[0].paragraphs[0].insertionPoints[intParaCharLength - 1].select();
+					myDoc.selection[0].contents = " " + myDOIurl + arrDOIs[intHypIDlength];
+					try{
+						var myHyperlinkURL = myDoc.hyperlinkURLDestinations.add(myDOIurl + arrDOIs[intHypIDlength], {name: myDOIurl + arrDOIs[intHypIDlength]} );
+					}
+					catch(f) {
+						var myHyperlinkURL = myDoc.hyperlinkURLDestinations.item(myDOIurl + arrDOIs[intHypIDlength]);
+					}
+					var mySel = myDoc.selection[0].paragraphs[0].characters.itemByRange(
+							intParaCharLength, 
+							intParaCharLength + myDOIurl.length - 1 + arrDOIs[intHypIDlength].length
+						);
+					mySel.applyCharacterStyle(myLinkCharStyle);
+					myHyperlinkSource = myDoc.hyperlinkTextSources.add(mySel);
+					myHyperlink = myDoc.hyperlinks.add(myHyperlinkSource, myHyperlinkURL);
+					myHyperlink.name = arrDOIs[intHypIDlength] + "_" + Math.random();
+					myHyperlink.visible = false;
+					//myHyperlink.borderColor = UIColors.BLUE;
+					//myHyperlink.borderStyle = HyperlinkAppearanceStyle.SOLID;
+					//myHyperlink.highlight = HyperlinkAppearanceHighlight.OUTLINE;
+				}
+			} catch(e) {
+				intNotFound++;
+				arrNotFound.push( arrDOIs[intHypIDlength] + " " + arrHyperlinkIDs[intHypIDlength] );
 			}
-		} catch(e) {
-		  intNotFound++;
-		  arrNotFound.push( arrDOIs[intHypIDlength] + " " + arrHyperlinkIDs[intHypIDlength] );
-	  }
-  }
-	if(intNotFound != 0) {
-		alert("Fertig!\rEs wurden von " + arrHyperlinkIDs.length + " DOIs folgende " + intNotFound + " nicht hinzugefügt:\r\r" + arrNotFound.join("\r"), "DOI hinzufügen");
-	} else {
-		alert("Fertig!\rEs wurden " + arrHyperlinkIDs.length + " DOIs hinzugefügt.", "DOI hinzufügen");
+			myDoc.select(NothingEnum.NOTHING);
+		}
+		if(intNotFound != 0) {
+			alert("Fertig!\rEs wurden von " + arrHyperlinkIDs.length + " DOIs folgende " + intNotFound + " nicht hinzugefügt:\r\r" + arrNotFound.join("\r"), "DOI hinzufügen");
+		} else {
+			alert("Fertig!\rEs wurden " + arrHyperlinkIDs.length + " DOIs hinzugefügt.", "DOI hinzufügen");
+		}
 	}
+	else alert("FEHLER!\r\rDas Zeichenformat \"" + myLinkCharStyleName + "\" ist nicht angelegt."); 
 } else{
-	alert("FEHLER: Es ist kein Dokument geöffnet!", "DOI hinzufügen");
+	alert("FEHLER!\r\rEs ist kein Dokument geöffnet!", "DOI hinzufügen");
+}
+
+function getCharacterStyle (_name, _dok) {
+	for (var i = 0; i &lt; _dok.allCharacterStyles.length; i++) {
+		if (_dok.allCharacterStyles[i].name == _name ) return _dok.allCharacterStyles[i];
+	}
+	return null;
 }</xsl:text>
   </xsl:template>
 

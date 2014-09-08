@@ -20,7 +20,7 @@
   <!-- Query all citations that have an ID and that do not already have a DOI.
        There should be some Schematron running beforehand so that citations 
        without ID will be reported. -->
-  <xsl:template match="ref[@id | mixed-citation/@id][not(pub-id[@pub-id-type eq 'doi'])]" mode="look-for-bib">
+  <xsl:template match="ref[@id | mixed-citation/@id][not(*/pub-id[@pub-id-type eq 'doi'])]" mode="look-for-bib">
     <!-- specific-use carries the name of InDesign’s HypertextDestination. We need this (if available) for the 
       generated .jsx -->
     <xsl:variable name="key" as="xs:string?" select="(@specific-use, @id, mixed-citation/@id)[1]"/>
