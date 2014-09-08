@@ -22,6 +22,7 @@
     <p:documentation>A transpect configuration file.</p:documentation>
   </p:input>
   <p:input port="merging-stylesheet">
+    <p:document href="../xsl/merge-results-with-query.xsl"/>
     <p:documentation>A stylesheet that receives the parameters and, in turn, each query result.</p:documentation>
   </p:input>
   <p:output port="result" primary="true" >
