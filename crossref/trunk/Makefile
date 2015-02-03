@@ -33,7 +33,7 @@ testi:
 #	$(FETCHMAIL) -f $(CODE)/crossref/infrastructure/fetchmailrc
 	$(CODE)/calabash/calabash.sh \
 		-i merging-stylesheet=$(call uri,$(MAKEFILEDIR)/xsl/merge-results-with-query.xsl) \
-		-i conf=$(call uri,$(CODE)/conf/hogrefe_conf.xml) \
+		-i conf=$(call uri,$(CODE)/conf/transpect-conf.xml) \
 		-o result=$(call win_path,$(CROSSREFTMP))/files.txt \
 		$(call uri,$(MAKEFILEDIR)/xpl/process-crossref-results.xpl) \
 		input-dir-uri=$(call uri,$(CROSSREFTMP)) \
