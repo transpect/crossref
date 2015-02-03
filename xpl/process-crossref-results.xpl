@@ -62,24 +62,10 @@
       <p:with-option name="file" select="replace(/crqr:crossref_result/crqr:query_result/crqr:head/crqr:doi_batch_id, '\?.+$', '')">
         <p:pipe port="result" step="query-result"/>
       </p:with-option>
-<!--      <p:with-option name="debug" select="$debug"/>  -->
-<!--      <p:with-option name="progress" select="$progress"/> -->
-<!--      <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/> -->
-<!--      <p:with-option name="status-dir-uri" select="$status-dir-uri"/>-->
       <p:input port="conf">
         <p:pipe port="conf" step="process-results"/>
       </p:input>
     </transpect:paths>
-    
-<!--    <hobots:paths name="paths">
-      <p:with-option name="pipeline" select="'process-crossref-results.xpl'"/>
-      <p:with-option name="file" select="replace(/crqr:crossref_result/crqr:query_result/crqr:head/crqr:doi_batch_id, '\?.+$', '')">
-        <p:pipe port="result" step="query-result"/>
-      </p:with-option>
-      <p:input port="conf">
-        <p:pipe port="conf" step="process-results"/>
-      </p:input>
-    </hobots:paths>-->
     <p:sink/>
     <crq:merge-results-with-query name="merge">
       <p:input port="source">
