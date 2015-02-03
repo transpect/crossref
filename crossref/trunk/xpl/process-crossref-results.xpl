@@ -16,7 +16,10 @@
     <p:documentation>Directory with crossref query result files (crossref_result
       xmlns="http://www.crossref.org/qrschema/2.0") </p:documentation>
   </p:option>
+  
   <p:option name="tmp-suffix" required="false" select="''"/>
+  <p:option name="clades" select="''"/>
+  <p:option name="interface-language" required="false" select="'de'"/>
   
   <p:input port="conf">
     <p:documentation>A transpect configuration file.</p:documentation>
