@@ -95,9 +95,9 @@
                                       distinct-values(
                                         for $ps in collection()/c:param-set
                                         return concat(
-                                          replace($ps/c:param[@name eq 'work-path']/@value, '^file:/*?(/)(([a-z]:)/)?', '$3$1', 'i'), 
+                                          replace($ps/c:param[@name eq 's9y1-path']/@value, '^file:/*?(/)(([a-z]:)/)?', '$3$1', 'i'), 
                                           'crossref/', 
-                                          $ps/c:param[@name eq 'work-basename']/@value,
+                                          $ps/c:param[@name eq 'basename']/@value,
                                           '.crossref.xml'
                                         )
                                       ),
