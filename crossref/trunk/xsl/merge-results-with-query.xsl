@@ -9,12 +9,12 @@
   
   <!-- See the comments in ../xpl/merge-results-with-query.xpl
        If no collection()[2] document is supplied, then the query body document
-       must be present below $work-path, with a file name as constructed below. -->
+       must be present below $s9y1-path, with a file name as constructed below. -->
   
   <xsl:key name="unstructured" match="crq:query[@key][crq:unstructured_citation]" use="@key"/>
   
-  <xsl:param name="work-path" as="xs:string?"/>
-  <xsl:param name="work-basename" as="xs:string?"/>
+  <xsl:param name="s9y1-path" as="xs:string?"/>
+  <xsl:param name="basename" as="xs:string?"/>
   
   <xsl:variable name="query-body" as="document-node(element(crq:query_batch))"
     select="if (collection()[2])
@@ -23,10 +23,10 @@
                    resolve-uri(
                      concat(
                        'crossref/',
-                       $work-basename,
+                       $basename,
                        '.qb.xml'
                      ),
-                     $work-path
+                     $s9y1-path
                    )
                  )"/>
   
@@ -38,12 +38,12 @@
       <xsl:when test="collection()[2]">
         <xsl:sequence select="$merge"/>
       </xsl:when>
-      <xsl:when test="not($work-path) and not($work-basename)">
+      <xsl:when test="not($s9y1-path) and not($basename)">
         <xsl:message terminate="yes">If no work-path and no work-basename are given, there must be a second document with the
           query body in the default collection.</xsl:message>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:result-document href="{resolve-uri(concat('crossref/', $work-basename, '.crossref.xml'), $work-path)}">
+        <xsl:result-document href="{resolve-uri(concat('crossref/', $basename, '.crossref.xml'), $s9y1-path)}">
           <xsl:sequence select="$merge"/>
         </xsl:result-document>
       </xsl:otherwise>
