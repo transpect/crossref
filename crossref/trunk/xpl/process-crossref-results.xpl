@@ -6,7 +6,7 @@
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:crq="http://www.crossref.org/qschema/2.0"
   xmlns:crqr="http://www.crossref.org/qrschema/2.0"
-  xmlns:hobots="http://hobots.hogrefe.com/" 
+  xmlns:transpect="http://www.le-tex.de/namespace/transpect" 
   xmlns:jats="http://jats.nlm.nih.gov"
   version="1.0"
   name="process-results"
@@ -32,7 +32,7 @@
 
   <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
   <p:import href="merge-results-with-query.xpl"/>
-  <p:import href="http://customers.le-tex.de/generic/book-conversion/adaptions/common/xpl/hobots-paths.xpl"/>
+  <p:import href="http://transpect.le-tex.de/book-conversion/converter/xpl/paths.xpl"/>
   
   <p:directory-list name="list-input-files" exclude-filter=".*\.txt.?">
     <p:with-option name="path" select="$input-dir-uri"/>
@@ -47,7 +47,28 @@
       <p:with-option name="href" select="resolve-uri(/*/@name, base-uri())"/>
     </p:load>
     <p:sink/>
-    <hobots:paths name="paths">
+    <p:load name="import-paths-xsl">
+      <p:with-option name="href" select="(/*/@paths-xsl-uri, 'http://transpect.le-tex.de/book-conversion/converter/xsl/paths.xsl')[1]">
+        <p:pipe port="conf" step="process-results"/>
+      </p:with-option>
+    </p:load>
+    <transpect:paths name="paths" determine-transpect-project-version="yes">
+      <p:with-option name="pipeline" select="'process-crossref-results.xpl'"/>
+      <p:with-option name="interface-language" select="$interface-language"/>
+      <p:with-option name="clades" select="$clades"/>
+      <p:with-option name="file" select="replace(/crqr:crossref_result/crqr:query_result/crqr:head/crqr:doi_batch_id, '\?.+$', '')">
+        <p:pipe port="result" step="query-result"/>
+      </p:with-option>
+<!--      <p:with-option name="debug" select="$debug"/>  -->
+<!--      <p:with-option name="progress" select="$progress"/> -->
+<!--      <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/> -->
+<!--      <p:with-option name="status-dir-uri" select="$status-dir-uri"/>-->
+      <p:input port="conf">
+        <p:pipe port="conf" step="process-results"/>
+      </p:input>
+    </transpect:paths>
+    
+<!--    <hobots:paths name="paths">
       <p:with-option name="pipeline" select="'process-crossref-results.xpl'"/>
       <p:with-option name="file" select="replace(/crqr:crossref_result/crqr:query_result/crqr:head/crqr:doi_batch_id, '\?.+$', '')">
         <p:pipe port="result" step="query-result"/>
@@ -55,7 +76,7 @@
       <p:input port="conf">
         <p:pipe port="conf" step="process-results"/>
       </p:input>
-    </hobots:paths>
+    </hobots:paths>-->
     <p:sink/>
     <crq:merge-results-with-query name="merge">
       <p:input port="source">
