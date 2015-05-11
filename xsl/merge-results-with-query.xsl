@@ -16,7 +16,7 @@
   <xsl:param name="s9y1-path" as="xs:string?"/>
   <xsl:param name="basename" as="xs:string?"/>
   
-<!--  <xsl:variable name="_query-body" as="document-node(element(crq:query_batch))"
+  <xsl:variable name="query-body" as="document-node(element(crq:query_batch))"
     select="if (collection()[2])
             then collection()[2]
             else document(
@@ -28,21 +28,9 @@
                      ),
                      $s9y1-path
                    )
-                 )"/>-->
-
-  <xsl:variable name="query-body" as="document-node(element(crq:query_batch))">
-    <xsl:document><crq:query_batch/></xsl:document>
-</xsl:variable>
+                 )"/>
   
   <xsl:template match="/" mode="#default">
-<xsl:message select="'DDDDDDDDDDDDDDDDDD ', 
-                     concat(
-                       'crossref/',
-                       $basename,
-                       '.qb.xml'
-                     ),
-                     $s9y1-path
-                   "/>
     <xsl:variable name="merge">
       <xsl:apply-templates select="*" mode="merge"/>
     </xsl:variable>
