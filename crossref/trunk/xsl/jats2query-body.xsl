@@ -97,7 +97,18 @@
     </xsl:variable>
     <xsl:if test="$name">
       <xsl:element name="{$name}">
-        <xsl:value-of select="replace(crq:normalize-space(.), '(^[.,;]|[.,;]\s*$)', '')"/>
+        <xsl:variable name="normalize-space-etc" as="xs:string">
+          <xsl:choose>
+            <xsl:when test="$name = 'journal_title'">
+              <!-- We found that out by chance… -->
+              <xsl:sequence select="replace(crq:normalize-space(.), ':', '%3A')"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:sequence select="crq:normalize-space(.)"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:value-of select="replace($normalize-space-etc, '(^[.,;]|[.,;]\s*$)', '')"/>
       </xsl:element>
     </xsl:if>
   </xsl:template>
