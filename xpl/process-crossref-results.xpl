@@ -65,6 +65,9 @@
       <p:input port="conf">
         <p:pipe port="conf" step="process-results"/>
       </p:input>
+      <p:input port="params">
+        <p:empty/>
+      </p:input>
     </transpect:paths>
     <p:sink/>
     <crq:merge-results-with-query name="merge">
