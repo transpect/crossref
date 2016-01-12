@@ -6,7 +6,7 @@
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:crq="http://www.crossref.org/qschema/2.0"
   xmlns:crqr="http://www.crossref.org/qrschema/2.0"
-  xmlns:transpect="http://www.le-tex.de/namespace/transpect" 
+  xmlns:tr="http://transpect.io" 
   xmlns:jats="http://jats.nlm.nih.gov"
   version="1.0"
   name="process-results"
@@ -35,7 +35,7 @@
 
   <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
   <p:import href="merge-results-with-query.xpl"/>
-  <p:import href="http://transpect.le-tex.de/book-conversion/converter/xpl/paths.xpl"/>
+  <p:import href="http://transpect.io/cascade/xpl/paths.xpl"/>
   
   <p:directory-list name="list-input-files" exclude-filter=".*\.txt.?">
     <p:with-option name="path" select="$input-dir-uri"/>
@@ -51,11 +51,11 @@
     </p:load>
     <p:sink/>
     <p:load name="import-paths-xsl">
-      <p:with-option name="href" select="(/*/@paths-xsl-uri, 'http://transpect.le-tex.de/book-conversion/converter/xsl/paths.xsl')[1]">
+      <p:with-option name="href" select="(/*/@paths-xsl-uri, 'http://transpect.io/cascade/xsl/paths.xsl')[1]">
         <p:pipe port="conf" step="process-results"/>
       </p:with-option>
     </p:load>
-    <transpect:paths name="paths" determine-transpect-project-version="yes">
+    <tr:paths name="paths" determine-transpect-project-version="yes">
       <p:with-option name="pipeline" select="'process-crossref-results.xpl'"/>
       <p:with-option name="interface-language" select="$interface-language"/>
       <p:with-option name="clades" select="$clades"/>
@@ -68,7 +68,7 @@
       <p:input port="params">
         <p:empty/>
       </p:input>
-    </transpect:paths>
+    </tr:paths>
     <p:sink/>
     <crq:merge-results-with-query name="merge">
       <p:input port="source">
