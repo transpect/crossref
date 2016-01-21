@@ -15,5 +15,7 @@ Create and adapt local_defs.mk according to your needs.
 In procmailrc, it should be necessary to use only one of base64 or qprint, not both. In the template,
 there are both. Look at the mail that you are receiving and decide.
 
+Maybe you need to touch infrastructure/timestamp
+
 Establish a cron job that invokes 
 make -f /path/to/crossref/Makefile fetchmail
