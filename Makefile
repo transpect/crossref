@@ -22,6 +22,9 @@ PASS=pass
 CROSSREFTMP=~/crossref
 FETCHMAIL=fetchmail
 FIRE=true
+# The work subdir where the source XML files reside
+XMLSUBDIR=xml
+BACKUP_FILES=$(abspath $(CROSSREFTMP)/../fetchmail.log) $(addprefix $(CODE)/crossref/,local_defs.mk infrastructure/fetchmailrc infrastructure/procmailrc infrastructure/fetch_and_process_crossref.sh infrastructure/crontab)
 
 -include $(MAKEFILEDIR)/local_defs.mk
 
@@ -86,10 +89,32 @@ remove_old_crossrefs:
 	-svn ci $(addsuffix .jsx,$(basename $(call unix_paths,$(abspath $(CROSSREFTMP))/files.txt))) -m automatic
 
 
+# BACKUP THE CONFIG
+
+#.PHONY: $(BACKUP_FILES)
+
+%/fetchmail.log: FORCE
+	-rm $@
+	touch $@
+
+%/crontab: FORCE
+	crontab -l > $@
+
+%/conf_backup.tgz: $(BACKUP_FILES)
+	-rm $@~
+	-mv $@ $@~
+	tar czf $@ $^
+	chmod 600 $@
+
+backup_conf: FORCE $(CODE)/crossref/infrastructure/conf_backup.tgz
+
+FORCE:
+
+
 .SECONDEXPANSION:
 
 # This target will issue a crossref request
-%.qb.xml: $$(subst crossref,hobots,$$(subst .qb,,$$@))
+%.qb.xml: $$(subst crossref,$(XMLSUBDIR),$$(subst .qb,,$$@))
 	echo "nun $@ erzeugen" >> $(ACTIONLOG)
 	echo "ggf. Werkverzeichnis $(abspath $(addsuffix ..,$(dir $@))) erstellen" >> $(ACTIONLOG)
 	-svn mkdir $(abspath $(addsuffix ..,$(dir $@)))

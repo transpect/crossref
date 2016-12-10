@@ -1,4 +1,4 @@
-set postmaster POSTMASTER_MAIL
-set logfile FETCHMAIL_LOG
+set postmaster YOUR.MAIL@YOUR.ORG
+set logfile /path/to/CROSSREFRESULTS/fetchmail.log
 
-poll IMAPHOST protocol imap username USER password PASS mda "/usr/bin/procmail -m ./procmailrc"
+poll IMAPHOST protocol imap username USER password 'PASS' ssl mda "/usr/bin/procmail -m /path/to/crossref/infrastructure/procmailrc"
