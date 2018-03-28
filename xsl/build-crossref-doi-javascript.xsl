@@ -64,7 +64,7 @@
     <xsl:text>#target indesign
 app.scriptPreferences.userInteractionLevel = UserInteractionLevels.interactWithAll;
 var myLinkCharStyleName = "ch_xref_doi";
-var myDOIurl = "http://doi.org/";
+var myDOIurl = "https://doi.org/";
 </xsl:text>
   </xsl:template>
 
