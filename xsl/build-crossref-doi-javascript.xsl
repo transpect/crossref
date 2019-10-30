@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <xsl:stylesheet
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -76,24 +76,34 @@ var myDOIurl = "https://doi.org/";
     arrNotFound = [];
 	var myLinkCharStyle = getCharacterStyle(myLinkCharStyleName, myDoc); // ==>
 	if(myLinkCharStyle) {
+		var myCRSs = myDoc.crossReferenceSources,
+				myCRSs_counter = myCRSs.length;
+		while(myCRSs_counter--) {
+			// cleanup: delete source texts in current p_ref paragraph (see https://redmine.le-tex.de/issues/6663#note-24)
+			if(myCRSs[myCRSs_counter].sourceText.appliedParagraphStyle.name.match("^p_ref"))
+				{myCRSs[myCRSs_counter].remove()}
+		}
 		while( intHypIDlength-- ) {
 			try{
 				var myHyperlink = myDoc.hyperlinkTextDestinations.itemByName(arrHyperlinkIDs[intHypIDlength]),
+					myDOIstring = myDOIurl + arrDOIs[intHypIDlength],
 					myPara = myHyperlink.destinationText.paragraphs[0].select(),
-					intParaCharLength = myDoc.selection[0].contents.length;
-				if (! myDoc.selection[0].contents.match(RegExp(myDOIurl))) {
+					intParaCharLength = myDoc.selection[0].contents.length,
+					lastParaDOIchars = myDoc.selection[0].paragraphs[0].characters.itemByRange(
+							intParaCharLength - 1 ,
+							intParaCharLength - 1 - arrDOIs[intHypIDlength].length - myDOIurl.length 
+						).contents.toString().replace(/.$/, '');
+				var myDOIstringIsPresentAndUnlinked = myDOIstring.localeCompare(lastParaDOIchars) == 0 && myDoc.selection[0].paragraphs[0].findHyperlinks().length == 0;
+				if ((! myDoc.selection[0].contents.match(RegExp(myDOIurl))) || myDOIstringIsPresentAndUnlinked) {
 					myDoc.selection[0].paragraphs[0].insertionPoints[intParaCharLength - 1].select();
-					myDoc.selection[0].contents = " " + myDOIurl + arrDOIs[intHypIDlength];
+					if(!myDOIstringIsPresentAndUnlinked) {myDoc.selection[0].contents = " " + myDOIstring;}
 					try{
-						var myHyperlinkURL = myDoc.hyperlinkURLDestinations.add(myDOIurl + arrDOIs[intHypIDlength], {name: myDOIurl + arrDOIs[intHypIDlength]} );
+						var myHyperlinkURL = myDoc.hyperlinkURLDestinations.add(myDOIstring, {name: myDOIstring} );
 					}
 					catch(f) {
-						var myHyperlinkURL = myDoc.hyperlinkURLDestinations.item(myDOIurl + arrDOIs[intHypIDlength]);
+						var myHyperlinkURL = myDoc.hyperlinkURLDestinations.item(myDOIstring);
 					}
-					var mySel = myDoc.selection[0].paragraphs[0].characters.itemByRange(
-							intParaCharLength, 
-							intParaCharLength + myDOIurl.length - 1 + arrDOIs[intHypIDlength].length
-						);
+					var mySel = (myDOIstringIsPresentAndUnlinked)?myDoc.selection[0].paragraphs[0].characters.itemByRange(intParaCharLength - arrDOIs[intHypIDlength].length - myDOIurl.length - 1, intParaCharLength - 2):myDoc.selection[0].paragraphs[0].characters.itemByRange(intParaCharLength,  intParaCharLength + myDOIurl.length - 1 + arrDOIs[intHypIDlength].length);                    
 					mySel.applyCharacterStyle(myLinkCharStyle);
 					myHyperlinkSource = myDoc.hyperlinkTextSources.add(mySel);
 					myHyperlink = myDoc.hyperlinks.add(myHyperlinkSource, myHyperlinkURL);
