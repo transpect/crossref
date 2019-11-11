@@ -93,7 +93,7 @@ var myDOIurl = "https://doi.org/";
 							intParaCharLength - 1 ,
 							intParaCharLength - 1 - arrDOIs[intHypIDlength].length - myDOIurl.length 
 						).contents.toString().replace(/.$/, '');
-				var myDOIstringIsPresentAndUnlinked = myDOIstring.localeCompare(lastParaDOIchars) == 0 && myDoc.selection[0].paragraphs[0].findHyperlinks().length == 0;
+				var myDOIstringIsPresentAndUnlinked = myDOIstring.localeCompare(lastParaDOIchars) == 0 &amp;&amp; myDoc.selection[0].paragraphs[0].findHyperlinks().length == 0;
 				if ((! myDoc.selection[0].contents.match(RegExp(myDOIurl))) || myDOIstringIsPresentAndUnlinked) {
 					myDoc.selection[0].paragraphs[0].insertionPoints[intParaCharLength - 1].select();
 					if(!myDOIstringIsPresentAndUnlinked) {myDoc.selection[0].contents = " " + myDOIstring;}
