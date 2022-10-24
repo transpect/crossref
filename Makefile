@@ -119,6 +119,7 @@ FORCE:
 	echo "ggf. Werkverzeichnis $(abspath $(addsuffix ..,$(dir $@))) erstellen" >> $(ACTIONLOG)
 	-svn mkdir $(abspath $(addsuffix ..,$(dir $@)))
 	-svn mkdir $(dir $@)
+	-svn add $@
 	$(CODE)/calabash/calabash.sh \
 		-i source=$(call uri,$<) \
 		-o qb=$(call win_path,$@) \
