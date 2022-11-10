@@ -119,13 +119,13 @@ FORCE:
 	echo "ggf. Werkverzeichnis $(abspath $(addsuffix ..,$(dir $@))) erstellen" >> $(ACTIONLOG)
 	-svn mkdir $(abspath $(addsuffix ..,$(dir $@)))
 	-svn mkdir $(dir $@)
-	-svn add $@
 	$(CODE)/calabash/calabash.sh \
 		-i source=$(call uri,$<) \
 		-o qb=$(call win_path,$@) \
 		$(call uri,$(MAKEFILEDIR)/xpl/jats-submit-crossref-query.xpl) \
 		user=$(CROSSREFUSER) pass=$(CROSSREFPASS) \
 		email=$(EMAIL) fire=$(FIRE) 2>&1 >> $(ACTIONLOG)
+	-svn add $@
 	-svn ci --depth empty $(abspath $(addsuffix ..,$(dir $@))) -m automatic 2>&1 >> $(ACTIONLOG)
 	-svn ci $(dir $@) -m automatic 2>&1 >> $(ACTIONLOG)
 
