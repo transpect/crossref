@@ -64,7 +64,9 @@ fetchmail: $(abspath $(CROSSREFTMP))/files.txt
 	$(foreach file,$(call unix_paths,$<),$(MAKE) -C $(MAKEFILEDIR) process_fetched FILE=$(file); )
 
 process_fetched:
-	-svn up $(FILE)
+#	-svn up $(FILE)
+# update series dir:
+	-svn up $(abspath $(addsuffix ../..,$(dir $(FILE))))
 	-svn lock $(FILE)
 	mv $(FILE).tmp $(FILE)
 	-svn add --depth empty $(abspath $(addsuffix ..,$(dir $(FILE))))
