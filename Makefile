@@ -65,6 +65,7 @@ fetchmail: $(abspath $(CROSSREFTMP))/files.txt
 
 process_fetched:
 #	-svn up $(FILE)
+	-svn up $(CODE) 
 # update series dir:
 	-svn up $(abspath $(addsuffix ../..,$(dir $(FILE))))
 	-svn lock $(FILE)
