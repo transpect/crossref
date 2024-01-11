@@ -56,7 +56,7 @@
         <p:pipe port="conf" step="process-results"/>
       </p:with-option>
     </p:load>
-    <tr:paths name="paths" determine-transpect-project-version="yes">
+    <tr:paths name="paths" determine-transpect-project-version="no">
       <p:with-option name="pipeline" select="'process-crossref-results.xpl'"/>
       <p:with-option name="interface-language" select="$interface-language"/>
       <p:with-option name="clades" select="$clades"/>
