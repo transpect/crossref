@@ -50,24 +50,36 @@ testi:
 # This target should be invoked periodically.
 # See README.txt for preparation instructions
 %/files.txt:
+	-svn up $(CODE) 
 	$(FETCHMAIL) -f $(CODE)/crossref/infrastructure/fetchmailrc || [ $$? -eq 1 ]
-	$(CODE)/calabash/calabash.sh -D \
+	-$(CODE)/calabash/calabash.sh -D \
 		-i merging-stylesheet=$(call uri,$(MAKEFILEDIR)/xsl/merge-results-with-query.xsl) \
 		-i conf=$(call uri,$(CODE)/conf/transpect-conf.xml) \
 		-o result=$(call win_path,$@) \
 		$(call uri,$(MAKEFILEDIR)/xpl/process-crossref-results.xpl) \
 		input-dir-uri=$(call uri,$(CROSSREFTMP)) \
+		merge-results-with-query=false \
 		tmp-suffix=".tmp" \
-		2> $(CROSSREFTMP)/process-crossref-results.txt
+		2> $(CROSSREFTMP)/proto-process-crossref-results.txt
 
 fetchmail: $(abspath $(CROSSREFTMP))/files.txt
+	$(foreach file,$(call unix_paths,$<),$(MAKE) -C $(MAKEFILEDIR) update_dirs FILE=$(file); )
+	-$(CODE)/calabash/calabash.sh -D \
+		-i merging-stylesheet=$(call uri,$(MAKEFILEDIR)/xsl/merge-results-with-query.xsl) \
+		-i conf=$(call uri,$(CODE)/conf/transpect-conf.xml) \
+		-o result=$(call win_path,$@) \
+		$(call uri,$(MAKEFILEDIR)/xpl/process-crossref-results.xpl) \
+		input-dir-uri=$(call uri,$(CROSSREFTMP)) \
+		merge-results-with-query=true \
+		tmp-suffix=".tmp" \
+		2> $(CROSSREFTMP)/process-crossref-results.txt
 	$(foreach file,$(call unix_paths,$<),$(MAKE) -C $(MAKEFILEDIR) process_fetched FILE=$(file); )
 
-process_fetched:
-#	-svn up $(FILE)
-	-svn up $(CODE) 
+update_dirs:
 # update series dir:
 	-svn up $(abspath $(addsuffix ../..,$(dir $(FILE))))
+
+process_fetched:
 	-svn lock $(FILE)
 	mv $(FILE).tmp $(FILE)
 	-svn add --depth empty $(abspath $(addsuffix ..,$(dir $(FILE))))
