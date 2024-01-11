@@ -16,6 +16,7 @@
     <p:documentation>Directory with crossref query result files (crossref_result
       xmlns="http://www.crossref.org/qrschema/2.0") </p:documentation>
   </p:option>
+  <p:option name="merge-results-with-query" select="'true'"/>
   
   <p:option name="tmp-suffix" required="false" select="''"/>
   <p:option name="clades" select="''"/>
@@ -70,19 +71,30 @@
       </p:input>
     </tr:paths>
     <p:sink/>
-    <crq:merge-results-with-query name="merge">
-      <p:input port="source">
-        <p:pipe port="result" step="query-result"/>
-      </p:input>
-      <p:input port="qb"><p:empty/></p:input>
-      <p:input port="merging-stylesheet">
-        <p:pipe port="merging-stylesheet" step="process-results"/>
-      </p:input>
-      <p:input port="params">
-        <p:pipe port="result" step="paths"/>
-      </p:input>
-      <p:with-option name="tmp-suffix" select="$tmp-suffix"/>
-    </crq:merge-results-with-query>
+    <p:choose name="conditionally-merge-results-with-query">
+      <p:when test="$merge-results-with-query = 'true'">
+        <crq:merge-results-with-query name="merge">
+          <p:input port="source">
+            <p:pipe port="result" step="query-result"/>
+          </p:input>
+          <p:input port="qb"><p:empty/></p:input>
+          <p:input port="merging-stylesheet">
+            <p:pipe port="merging-stylesheet" step="process-results"/>
+          </p:input>
+          <p:input port="params">
+            <p:pipe port="result" step="paths"/>
+          </p:input>
+          <p:with-option name="tmp-suffix" select="$tmp-suffix"/>
+        </crq:merge-results-with-query>    
+      </p:when>
+      <p:otherwise>
+        <p:identity>
+          <p:input port="source">
+            <p:inline><bogo/></p:inline>
+          </p:input>
+        </p:identity>
+      </p:otherwise>
+    </p:choose>
     <p:sink/>
   </p:for-each>
   
