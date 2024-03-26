@@ -118,7 +118,6 @@
     <xsl:value-of select="replace(., '^([\w\p{Pd}]+)\.', '$1, Jj')"/>
   </xsl:template>
   
-
   <xsl:template match="text()" mode="transform-bib">
     <xsl:value-of select="replace(., '&#xad;', '')"/>
   </xsl:template>
@@ -141,6 +140,7 @@
     <xsl:param name="input" as="xs:string"/>
     <xsl:sequence select="substring( 
 			    normalize-space(
+			                     replace(
                               replace(
                                   replace(
                                     $input, (: eliminating space around the dash in page number ranges :)
@@ -149,7 +149,9 @@
                                   ),
                                 '[\p{Zs}\s]+', 
                                 ' '
-                              )
+                              ),
+                              '^\d+\.\p{Zs}+', (: eliminating number in Vancouver :)
+                              '', 's')
                             ),
 			    1,
 			    256
