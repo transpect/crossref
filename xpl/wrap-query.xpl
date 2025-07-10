@@ -73,7 +73,7 @@
       <p:inline>
         <c:request 
           method="POST" 
-          href="http://doi.crossref.org/servlet/deposit?operation=doQueryUpload&amp;login_id={$user}&amp;login_passwd={$pass}">
+          href="https://doi.crossref.org/servlet/deposit?operation=doQueryUpload&amp;login_id={$user}&amp;login_passwd={$pass}">
           <c:multipart content-type="multipart/form-data" boundary="=-=-=-=-=">
             <c:body content-type="application/xml" disposition='form-data; name="fname"; filename="hobots-refs.xml"'>
               {/*}
